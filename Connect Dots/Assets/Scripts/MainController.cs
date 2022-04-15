@@ -10,6 +10,9 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private Selector selector;
 
+    [SerializeField]
+    private ScenceUI scenceUI;
+
     private StepData stepData;
 
     private void StartStep()
@@ -33,7 +36,7 @@ public class MainController : MonoBehaviour
 
         stepData.Cell.Highlight(false);
 
-        var destroyed = debugGrid.DestroyLines(stepData.Cell.transform.position);
+        scenceUI.Point.Value += debugGrid.DestroyLines(stepData.Cell.transform.position);
         
         debugGrid.Generate(3);
     }
