@@ -1,44 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
+using DG.Tweening.Plugins.Options;
+using DG.Tweening.Plugins.Core.PathCore;
+using DG.Tweening.Core;
+
+
 
 public class Sphere : MonoBehaviour
 {
     public event System.Action<Sphere> OnMoveComplete;
 
-    private List<Vector3> path;
-    private int index;
-
-    private IEnumerator Move()
-    {
-        while(index != path.Count)
-        {
-            transform.position = path[index];
-
-            yield return new WaitForSeconds(0.15f);
-
-            index++;
-        }
-
-        OnMoveComplete?.Invoke(this);
-    }
+    private TweenerCore<Vector3, Path, PathOptions> moveTween;
+    private TweenerCore<Vector3, Vector3, VectorOptions> scaleTween;
 
     public void Move(List<Vector3> path)
     {
-        this.path = path;
-        index = 0;
-
-        StartCoroutine(Move());
+        moveTween = transform.DOPath(path.ToArray(), path.Count * 0.1f)
+            .SetEase(Ease.Linear)
+            .OnComplete(() => OnMoveComplete?.Invoke(this));
     }
 
+    public void Destroy()
+    {
+        scaleTween = transform.DOScale(0.1f, 0.25f).OnComplete(() =>
+        {
+            GameObject.Destroy(gameObject);
+        });
+    }
     void Start()
     {
         
     }
 
-    
-    void Update()
+    private void OnDestroy()
     {
-        
+        moveTween?.Kill();
+        scaleTween.Kill();
     }
 }

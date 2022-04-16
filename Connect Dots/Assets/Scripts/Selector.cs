@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Selector : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class Selector : MonoBehaviour
 
     [SerializeField]
     private Camera camera;
+
+    [SerializeField]
+    private EventSystem eventSystem;
 
     private Sphere selected;
 
@@ -38,6 +42,8 @@ public class Selector : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
+            if (eventSystem.IsPointerOverGameObject()) return;
+
             var sphere = Raycast<Sphere>();
 
             if(sphere != null)

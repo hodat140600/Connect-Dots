@@ -13,7 +13,7 @@ public enum CellType {
 
 public class DebugGrid : MonoBehaviour
 {
-    private const int SIZE = 9;
+    public const int SIZE = 9;
 
     //public event Action<int[,]> OnNewWave;
 
@@ -28,6 +28,11 @@ public class DebugGrid : MonoBehaviour
     private GameObject greenSphere;
 
     private CellType[,] cells;
+
+    public CellType[,] GetCells()
+    {
+        return cells;
+    }
 
     private int[,] wave;
 
@@ -170,7 +175,7 @@ public class DebugGrid : MonoBehaviour
         return wave;
     }
 
-    private List<Vector2Int> GetEmptyCoords() 
+    public List<Vector2Int> GetEmptyCoords() 
     {
         var emptyCoords = new List<Vector2Int>();
 
@@ -277,7 +282,7 @@ public class DebugGrid : MonoBehaviour
     {
         HashSet<Vector2Int> line = new HashSet<Vector2Int>();
 
-        for(int i = 0; i < SIZE; i++)
+        for(int i = 0; i < SIZE * SIZE; i++)
         {
             int x = pos.x + i * dx;
             int y = pos.y + i * dy;
@@ -330,46 +335,6 @@ public class DebugGrid : MonoBehaviour
             line.Clear();
         }
 
-        //line.UnionWith( CheckLine(_pos, 1, 0));
-        //line.UnionWith( CheckLine(_pos, -1, 0));
-
-        //if(line.Count >= 5)
-        //{
-        //    destroyed.UnionWith(line);
-        //}
-
-        //line.Clear();
-
-        //line.UnionWith(CheckLine(_pos, 0, 1));
-        //line.UnionWith(CheckLine(_pos, 0, -1));
-
-        //if (line.Count >= 5)
-        //{
-        //    destroyed.UnionWith(line);
-        //}
-
-        //line.Clear();
-
-        //line.UnionWith(CheckLine(_pos, 1, 1));
-        //line.UnionWith(CheckLine(_pos, -1, -1));
-
-        //if (line.Count >= 5)
-        //{
-        //    destroyed.UnionWith(line);
-        //}
-
-        //line.Clear();
-
-        //line.UnionWith(CheckLine(_pos, 1, -1));
-        //line.UnionWith(CheckLine(_pos, -1, 1));
-
-        //if (line.Count >= 5)
-        //{
-        //    destroyed.UnionWith(line);
-        //}
-
-        //line.Clear();
-
         List<Sphere> spheres = FindObjectsOfType<Sphere>().ToList();
 
         foreach(var sphere in spheres)
@@ -378,7 +343,7 @@ public class DebugGrid : MonoBehaviour
 
             if (destroyed.Contains(spherePos))
             {
-                GameObject.Destroy(sphere.gameObject);
+                sphere.Destroy();
 
                 cells[spherePos.x, spherePos.y] = CellType.Empty;
             }
@@ -389,10 +354,72 @@ public class DebugGrid : MonoBehaviour
     public void Clear()
     {
         cells = new CellType[SIZE, SIZE];
+
+        var list = GameObject.FindObjectsOfType<Sphere>().ToList();
+
+        foreach(var item in list)
+        {
+            GameObject.Destroy(item.gameObject);
+        }
     }
+
+    public void SetState(GameState state)
+    {
+        Clear();
+
+        cells = state.Cells;
+
+        for (int i = 0; i < SIZE; i++)
+        {
+            for (int j = 0; j < SIZE; j++)
+            {
+                CellType cellType = cells[j, i];
+                if (cellType != CellType.Empty)
+                {
+                    GameObject prefab = null;
+
+                    switch (cellType)
+                    {
+                        case CellType.Red:
+                            prefab = redSphere;
+                            break;
+                        case CellType.Green:
+                            prefab = greenSphere;
+                            break;
+                        case CellType.Blue:
+                            prefab = blueSphere;
+                            break;
+
+                    }
+                    Vector3 pos = ToWorldCoords(new Vector2Int(j, i));
+                    Instantiate(prefab, pos, Quaternion.identity);
+                }
+            }
+        }
+    }
+
     void Start()
     {
         
     }
 
+}
+
+[System.Serializable]
+public class GameState
+{
+    public int Points;
+    public CellType[,] Cells;
+
+    public GameState(CellType[,] cells, int points)
+    {
+        Points = points;
+        Cells = cells;
+    }
+
+    public GameState()
+    {
+        Points = 0;
+        Cells = new CellType[DebugGrid.SIZE, DebugGrid.SIZE];
+    }
 }
