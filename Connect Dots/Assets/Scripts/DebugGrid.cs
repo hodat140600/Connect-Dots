@@ -423,3 +423,19 @@ public class GameState
         Cells = new CellType[DebugGrid.SIZE, DebugGrid.SIZE];
     }
 }
+
+[System.Serializable]
+public class HighScore
+{
+    public int HighScores;
+
+    public HighScore(int highScores)
+    {
+        HighScores = highScores;
+    }
+
+    public HighScore()
+    {
+        HighScores = 0;
+    }
+}

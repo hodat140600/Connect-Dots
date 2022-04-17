@@ -10,6 +10,7 @@ public class ScenceUI : MonoBehaviour
     [SerializeField]
     private Point point;
 
+
     public Point Point
     {
         get

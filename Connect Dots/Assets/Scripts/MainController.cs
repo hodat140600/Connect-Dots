@@ -15,6 +15,8 @@ public class MainController : MonoBehaviour
 
     private StepData stepData;
 
+    
+
     private void StartStep()
     {
         selector.Locked = true;
@@ -38,7 +40,11 @@ public class MainController : MonoBehaviour
 
         scenceUI.Point.Value += debugGrid.DestroyLines(stepData.Cell.transform.position);
 
-        debugGrid.Generate(10); // generate ball by turn
+        //if (scenceUI.Point.Value > scenceUI.HighScore.Value) scenceUI.HighScore.Value = scenceUI.Point.Value;
+
+        debugGrid.Generate(3); // generate ball by turn
+
+        //if (debugGrid.GetEmptyCoords().Count == 0) GameSaver.AutoSave(new HighScore(scenceUI.HighScore.Value));
 
         SetActiveMenu( debugGrid.GetEmptyCoords().Count == 0); //lose
 
@@ -75,6 +81,8 @@ public class MainController : MonoBehaviour
         switch (buttonType)
         {
             case MainMenu.ButtonType.New:
+                GameManager.Instance.UpdateGameFlow(GameFlow.Playing);
+                
                 NewGama();
                 break;
             case MainMenu.ButtonType.Save:
@@ -118,7 +126,7 @@ public class MainController : MonoBehaviour
     {
         scenceUI.MainMenu.Active = active;
 
-        if (scenceUI.MainMenu.Active)
+        if (scenceUI.MainMenu.Active && GameManager.Instance.Flow != GameFlow.Start)
             scenceUI.MainMenu.EnableButton(MainMenu.ButtonType.Save, debugGrid.GetEmptyCoords().Count != 0);
     }
 
@@ -128,7 +136,13 @@ public class MainController : MonoBehaviour
 
         scenceUI.MainMenu.OnClick += MainMenu_OnClick;
 
-        NewGama();
+        //HighScore highScore = GameSaver.AutoLoad();
+
+        //scenceUI.HighScore.Value = highScore.HighScores;
+
+        SetActiveMenu(true);
+
+        //NewGama();
     }
 
     void Update()
